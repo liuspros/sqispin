@@ -31,7 +31,7 @@ button {
   position: relative;
   overflow: hidden; /* hides the slides that are off-screen */
   width: 100%;
-  height: clamp(190px, 28vw, 280px);
+  height: clamp(230px, 28vw, 290px);
   touch-action: pan-y; /* page can still scroll up/down, we handle left/right */
   user-select: none;
   box-shadow: 0 6px 24px rgba(11, 31, 92, 0.18);
@@ -48,7 +48,7 @@ button {
   position: relative;
   display: flex;
   align-items: center;
-  padding: 0 9%;
+  padding: 56px 9% 0; /* top space so the floating nav never covers the flyer text */
   overflow: hidden;
 }
 
@@ -498,9 +498,314 @@ footer {
   50% { transform: translateY(-9px); }
 }
 
+/* ---------- FLOATING NAV PILL (Apple style) ---------- */
+#navPill {
+  /* JS changes these two numbers; the CSS below reacts to them */
+  --count: 2; /* how many pages */
+  --index: 0; /* which page is open */
+  position: fixed; /* stays on screen while you scroll */
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50; /* sits above the banner and pages (popup is 100, so it stays above the nav) */
+  display: flex;
+  padding: 5px;
+  border-radius: 40px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(18px) saturate(180%); /* frosted glass */
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 8px 28px rgba(11, 31, 92, 0.22);
+}
+
+/* the white pill that slides behind the active button */
+#navIndicator {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 5px;
+  width: calc((100% - 10px) / var(--count));
+  border-radius: 30px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(11, 31, 92, 0.18);
+  transform: translateX(calc(var(--index) * 100%));
+  transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.nav-btn {
+  position: relative;
+  z-index: 1; /* above the indicator */
+  flex: 1 1 0;
+  min-width: 112px;
+  height: 38px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 30px;
+  background: transparent;
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: color 0.3s;
+}
+
+.nav-btn.active {
+  color: var(--blue);
+}
+
+.badge {
+  /* a little bubble on the corner of the button, like the red dot on iPhone apps.
+     It floats, so it can never push the tabs out of equal width */
+  position: absolute;
+  top: -3px;
+  right: 6px;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border-radius: 20px;
+  background: var(--orange);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 19px;
+  box-shadow: 0 2px 6px rgba(255, 122, 26, 0.5);
+}
+
+.badge:empty {
+  display: none; /* no number, no badge */
+}
+
+/* ---------- PAGES (the sliding track, same idea as the banner) ---------- */
+#pages {
+  width: 100%;
+  overflow: hidden; /* shows only one page at a time */
+  touch-action: pan-y;
+}
+
+#pagesTrack {
+  display: flex;
+  align-items: flex-start;
+  transition: transform 0.65s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.page {
+  flex: 0 0 100%;
+  min-width: 0;
+  min-height: 100vh;
+}
+
+/* the page that is off-screen is cut short, so the open page decides how tall the site is */
+.page.inactive {
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+/* ---------- SQI LOGO ON THE FLYERS ---------- */
+.slide-logo {
+  position: absolute;
+  top: 10px;
+  left: 9%;
+  z-index: 3;
+  height: 42px;
+  width: auto;
+  padding: 3px 6px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+/* ---------- NAME INPUT ---------- */
+#nameBox {
+  max-width: 320px;
+  margin: 0 auto 30px;
+}
+
+#playerName {
+  width: 100%;
+  height: 46px;
+  padding: 0 20px;
+  border: 2px solid #c5d3f5;
+  border-radius: 30px;
+  background: white;
+  color: var(--navy);
+  font-family: inherit;
+  font-size: 16px; /* 16px stops iPhones zooming in when you tap the box */
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#playerName:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 4px rgba(26, 86, 255, 0.15);
+}
+
+#playerName:disabled {
+  background: #eef2ff;
+  color: #7b8bb5;
+}
+
+#playerName.shake {
+  border-color: #e02424;
+  animation: shake 0.45s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-9px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(4px); }
+}
+
+#nameMessage {
+  min-height: 20px; /* keeps the layout from jumping when the message appears */
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #e02424;
+}
+
+/* ---------- HISTORY PAGE ---------- */
+#historyBox {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 96px 16px 40px; /* top space so the floating nav does not cover the title */
+  text-align: center;
+}
+
+#historyStats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.stat {
+  min-width: 86px;
+  padding: 10px 16px;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 4px 14px rgba(11, 31, 92, 0.08);
+}
+
+.stat strong {
+  display: block;
+  color: var(--blue);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.stat.total strong {
+  color: var(--orange);
+}
+
+.stat span {
+  color: #51618f;
+  font-size: 12px;
+}
+
+#historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 4px 14px rgba(11, 31, 92, 0.08);
+  animation: rowIn 0.4s both;
+}
+
+@keyframes rowIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.avatar {
+  flex: 0 0 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue), #4f86ff);
+  color: white;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.history-info {
+  flex: 1;
+  min-width: 0; /* lets long names get the "..." instead of stretching the row */
+}
+
+.history-name {
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-prize {
+  color: #51618f;
+  font-size: 13px;
+}
+
+.history-prize b {
+  color: var(--orange);
+}
+
+.history-time {
+  color: #8a97bb;
+  font-size: 11px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.history-thumb {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  padding: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffffff, #dfe9ff);
+  object-fit: contain;
+}
+
+#historyEmpty {
+  display: none;
+  margin: 30px 0;
+  color: #51618f;
+}
+
+#clearHistoryBtn {
+  height: 38px;
+  margin-top: 26px;
+  padding: 0 20px;
+  border: 1px solid #f3b3b3;
+  border-radius: 30px;
+  background: white;
+  color: #e02424;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 /* ---------- SMALL SCREENS ---------- */
 @media (max-width: 600px) {
-  .slide { padding: 0 6%; }
+  .slide-logo { height: 32px; left: 6%; top: 8px; padding: 2px 4px; border-radius: 9px; }
+  .nav-btn { min-width: 100px; }
+  .slide { padding: 54px 6% 0; }
   .slide-text { max-width: 60%; }
   .slide h2 { font-size: 21px; }
   .slide p { font-size: 11px; }

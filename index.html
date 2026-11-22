@@ -13,65 +13,112 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- ================= BANNER (auto-swipe) ================= -->
-    <section id="banner">
-      <div id="bannerTrack">
-        <!-- Flyer 1 -->
-        <div class="slide slide-blue">
-          <div class="slide-text">
-            <span class="tag">Free for every student</span>
-            <h2>Get a chance to win <em>amazing gifts</em></h2>
-            <p>Spin the wheel and walk away with something cool.</p>
-          </div>
-          <img class="slide-img img-one" src="images/watch.png" alt="Smart watch" />
-          <img class="slide-img img-two" src="images/powerbank.png" alt="Power bank" />
-        </div>
+    <!-- ================= FLOATING NAV PILL ================= -->
+    <nav id="navPill">
+      <span id="navIndicator"></span>
+      <button class="nav-btn active" onclick="showPage(0)">Spin</button>
+      <button class="nav-btn" onclick="showPage(1)">
+        History <span id="historyCount" class="badge"></span>
+      </button>
+    </nav>
 
-        <!-- Flyer 2 -->
-        <div class="slide slide-white">
-          <div class="slide-text">
-            <span class="tag tag-orange">SQI College of ICT</span>
-            <h2>SQI <em>Tech Fest</em> Week</h2>
-            <p>Code. Create. Celebrate. Come and be part of it.</p>
-          </div>
-          <img class="slide-img img-one" src="images/cap.png" alt="Cap" />
-          <img class="slide-img img-two" src="images/tshirt.png" alt="T-shirt" />
-        </div>
+    <!-- ================= PAGES (slide left / right) ================= -->
+    <div id="pages">
+      <div id="pagesTrack">
+        <!-- ---------- PAGE 1: SPIN ---------- -->
+        <section class="page" id="pageSpin">
+          <!-- BANNER (auto-swipe) -->
+          <section id="banner">
+            <div id="bannerTrack">
+              <!-- Flyer 1 -->
+              <div class="slide slide-blue">
+                <img class="slide-logo" src="images/logo.png" alt="SQI College of ICT" />
+                <div class="slide-text">
+                  <span class="tag">Free for every student</span>
+                  <h2>Get a chance to win <em>amazing gifts</em></h2>
+                  <p>Spin the wheel and walk away with something cool.</p>
+                </div>
+                <img class="slide-img img-one" src="images/watch.png" alt="Smart watch" />
+                <img class="slide-img img-two" src="images/powerbank.png" alt="Power bank" />
+              </div>
 
-        <!-- Flyer 3 -->
-        <div class="slide slide-orange">
-          <div class="slide-text">
-            <span class="tag tag-white">Today only</span>
-            <h2>Spin. Win. <em>Smile.</em></h2>
-            <p>Power banks, smart watches, caps, tees and more.</p>
+              <!-- Flyer 2 -->
+              <div class="slide slide-white">
+                <img class="slide-logo" src="images/logo.png" alt="SQI College of ICT" />
+                <div class="slide-text">
+                  <span class="tag tag-orange">SQI College of ICT</span>
+                  <h2>SQI <em>Tech Fest</em> Week</h2>
+                  <p>Code. Create. Celebrate. Come and be part of it.</p>
+                </div>
+                <img class="slide-img img-one" src="images/cap.png" alt="Cap" />
+                <img class="slide-img img-two" src="images/tshirt.png" alt="T-shirt" />
+              </div>
+
+              <!-- Flyer 3 -->
+              <div class="slide slide-orange">
+                <img class="slide-logo" src="images/logo.png" alt="SQI College of ICT" />
+                <div class="slide-text">
+                  <span class="tag tag-white">Today only</span>
+                  <h2>Spin. Win. <em>Smile.</em></h2>
+                  <p>Power banks, smart watches, caps, tees and more.</p>
+                </div>
+                <img class="slide-img img-one" src="images/pen.png" alt="Pen" />
+                <img class="slide-img img-two" src="images/watch.png" alt="Smart watch" />
+              </div>
+            </div>
+
+            <button class="arrow arrow-left" onclick="prevSlide()" aria-label="Previous">&#8249;</button>
+            <button class="arrow arrow-right" onclick="nextSlide()" aria-label="Next">&#8250;</button>
+            <div id="bannerDots"></div>
+          </section>
+
+          <!-- WHEEL -->
+          <main>
+            <h1>Free Gift <span>Spin Wheel</span></h1>
+            <p class="sub">Type your name, then tap <strong>SPIN</strong> and let luck pick your gift.</p>
+
+            <div id="nameBox">
+              <input
+                type="text"
+                id="playerName"
+                placeholder="Enter your name"
+                maxlength="20"
+                autocomplete="off"
+                aria-label="Your name"
+              />
+              <p id="nameMessage"></p>
+            </div>
+
+            <div id="wheelBox">
+              <div id="pointer"></div>
+              <div id="wheelFrame">
+                <canvas id="wheel"></canvas>
+              </div>
+              <button id="spinBtn" onclick="spin()">SPIN</button>
+            </div>
+
+            <button id="soundBtn" onclick="toggleSound()">Sound: On</button>
+          </main>
+
+          <footer>SQI Tech Fest Week &bull; Good luck!</footer>
+        </section>
+
+        <!-- ---------- PAGE 2: HISTORY ---------- -->
+        <section class="page inactive" id="pageHistory">
+          <div id="historyBox">
+            <h1>Spin <span>History</span></h1>
+            <p class="sub">Everyone who has spun, and what they won.</p>
+
+            <div id="historyStats"></div>
+
+            <div id="historyList"></div>
+            <p id="historyEmpty">No spins yet. Be the first to win!</p>
+
+            <button id="clearHistoryBtn" onclick="clearHistory()">Clear History</button>
           </div>
-          <img class="slide-img img-one" src="images/pen.png" alt="Pen" />
-          <img class="slide-img img-two" src="images/watch.png" alt="Smart watch" />
-        </div>
+        </section>
       </div>
-
-      <button class="arrow arrow-left" onclick="prevSlide()" aria-label="Previous">&#8249;</button>
-      <button class="arrow arrow-right" onclick="nextSlide()" aria-label="Next">&#8250;</button>
-      <div id="bannerDots"></div>
-    </section>
-
-    <!-- ================= WHEEL ================= -->
-    <main>
-      <h1>Free Gift <span>Spin Wheel</span></h1>
-      <p class="sub">Tap <strong>SPIN</strong> and let luck pick your gift.</p>
-
-      <div id="wheelBox">
-        <div id="pointer"></div>
-        <div id="wheelFrame">
-          <canvas id="wheel"></canvas>
-        </div>
-        <button id="spinBtn" onclick="spin()">SPIN</button>
-      </div>
-
-      <button id="soundBtn" onclick="toggleSound()">Sound: On</button>
-    </main>
-
-    <footer>SQI Tech Fest Week &bull; Good luck!</footer>
+    </div>
 
     <!-- ================= WIN POPUP ================= -->
     <div id="popup">

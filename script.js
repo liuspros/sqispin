@@ -14,6 +14,17 @@ const winText = document.getElementById("winText");
 const winImage = document.getElementById("winImage");
 const confettiCanvas = document.getElementById("confetti");
 const confettiCtx = confettiCanvas.getContext("2d");
+// new in v2: nav, pages, name box, history page
+const navPill = document.getElementById("navPill");
+const historyCount = document.getElementById("historyCount");
+const pagesBox = document.getElementById("pages");
+const pagesTrack = document.getElementById("pagesTrack");
+const playerName = document.getElementById("playerName");
+const nameMessage = document.getElementById("nameMessage");
+const historyList = document.getElementById("historyList");
+const historyStats = document.getElementById("historyStats");
+const historyEmpty = document.getElementById("historyEmpty");
+const clearHistoryBtn = document.getElementById("clearHistoryBtn");
 
 /* =====================================================
    2. BANNER SLIDER (auto-swipe)
@@ -87,12 +98,13 @@ startAutoSlide();
    3. THE PRIZES
    Add, remove or rename a prize here and the wheel updates itself.
    ===================================================== */
+// price is in naira. CHANGE THESE to your real costs: cheaper prizes win more often
 const prizes = [
-  { name: "Power Bank", image: "images/powerbank.png" },
-  { name: "T-Shirt", image: "images/tshirt.png" },
-  { name: "Pen", image: "images/pen.png", zoom: 1.4 }, // zoom makes thin items bigger on the wheel
-  { name: "Cap", image: "images/cap.png" },
-  { name: "Smart Watch", image: "images/watch.png" },
+  { name: "Power Bank", image: "images/powerbank.png", price: 15000 },
+  { name: "T-Shirt", image: "images/tshirt.png", price: 4000 },
+  { name: "Pen", image: "images/pen.png", price: 300, zoom: 1.4 }, // zoom makes thin items bigger on the wheel
+  { name: "Cap", image: "images/cap.png", price: 3000 },
+  { name: "Smart Watch", image: "images/watch.png", price: 20000 },
 ];
 
 // each prize appears twice so the wheel has 10 slices (looks fuller)
@@ -279,16 +291,39 @@ function toggleSound() {
    ===================================================== */
 let rotation = 0; // how far the wheel has turned, in degrees
 let isSpinning = false;
+let currentPlayer = ""; // the name of the person who is spinning right now
+
+// pressing Enter inside the name box also spins
+playerName.addEventListener("keydown", function (e) {
+  if (e.key === "Enter") spin();
+});
 
 function spin() {
   if (isSpinning) return;
+
+  // the name is required before every spin
+  const name = playerName.value.trim();
+  if (name === "") {
+    nameMessage.textContent = "Enter your name first";
+    playerName.classList.add("shake");
+    setTimeout(function () {
+      playerName.classList.remove("shake");
+    }, 500);
+    playerName.focus();
+    return;
+  }
+  nameMessage.textContent = "";
+  currentPlayer = name;
+  playerName.disabled = true; // lock the box while the wheel is turning
+
   isSpinning = true;
   spinBtn.disabled = true;
   startAudio();
   playStart();
 
-  // step 1: decide the winner FIRST (this is what makes it fair and random)
-  const winnerIndex = Math.floor(Math.random() * segments.length);
+  // step 1: decide the winner FIRST, using the price-weighted odds (see section 10)
+  const winnerPrize = pickPrize(); // which PRIZE wins
+  const winnerIndex = pickSlice(winnerPrize); // which of its slices the wheel lands on
 
   // step 2: work out how far to turn so that slice stops under the pointer
   // the little random offset stops it from always landing dead-center
@@ -338,6 +373,7 @@ function tickEffect() {
 function finishSpin(winnerIndex) {
   isSpinning = false;
   spinBtn.disabled = false;
+  saveSpin(currentPlayer, segments[winnerIndex]); // write name + prize to the history
   setTimeout(function () {
     showPopup(segments[winnerIndex]);
   }, 600);
@@ -355,8 +391,13 @@ function showPopup(prize) {
 }
 
 function closePopup() {
+  if (!popup.classList.contains("show")) return; // Escape key must not do anything when no popup is open
   popup.classList.remove("show");
   confettiRunning = false;
+
+  // get the box ready for the next person
+  playerName.value = "";
+  playerName.disabled = false;
 }
 
 document.addEventListener("keydown", function (e) {
@@ -411,4 +452,268 @@ function launchConfetti() {
     if (stillFalling) requestAnimationFrame(draw);
   }
   draw();
+}
+
+/* =====================================================
+   8. PAGES + FLOATING NAV
+   Same idea as the banner: a long strip that slides left and right.
+   ===================================================== */
+const pages = document.querySelectorAll(".page");
+const navButtons = document.querySelectorAll(".nav-btn");
+let currentPage = 0;
+
+// tell the CSS how many pages there are (it uses this for the width of the sliding pill)
+navPill.style.setProperty("--count", pages.length);
+
+function showPage(index) {
+  // CLAMP: the banner loops with %, but pages should NOT loop.
+  // Math.min stops us going past the last page, Math.max stops us going below 0.
+  currentPage = Math.max(0, Math.min(index, pages.length - 1));
+
+  pages[currentPage].classList.remove("inactive"); // wake up the page we are going to
+  pagesTrack.style.transform = `translateX(-${currentPage * 100}%)`;
+  navPill.style.setProperty("--index", currentPage); // CSS moves the white pill because of this
+
+  navButtons.forEach(function (btn, i) {
+    btn.classList.toggle("active", i === currentPage);
+  });
+  window.scrollTo(0, 0);
+
+  // when the slide has finished, put the other pages to sleep
+  setTimeout(function () {
+    pages.forEach(function (page, i) {
+      if (i !== currentPage) page.classList.add("inactive");
+    });
+  }, 700);
+}
+
+// swipe left / right with a finger to change page
+let pageStartX = 0;
+let pageStartY = 0;
+
+pagesBox.addEventListener("pointerdown", function (e) {
+  pageStartX = e.clientX;
+  pageStartY = e.clientY;
+});
+
+pagesBox.addEventListener("pointerup", function (e) {
+  if (e.pointerType === "mouse") return; // fingers only. Mouse users have the nav pill
+  if (e.target.closest("#banner") || e.target.closest("input")) return; // the banner has its own swipe
+  if (isSpinning || popup.classList.contains("show")) return;
+
+  const moveX = e.clientX - pageStartX;
+  const moveY = e.clientY - pageStartY;
+
+  // must be a long and mostly sideways move, so scrolling down the page does not count
+  if (Math.abs(moveX) < 70 || Math.abs(moveX) < Math.abs(moveY) * 1.5) return;
+
+  if (moveX < 0) showPage(currentPage + 1); // finger moved left, so go forward
+  else showPage(currentPage - 1); // finger moved right, so go back
+});
+
+/* =====================================================
+   9. SPIN HISTORY (saved in the browser with localStorage)
+   NOTE: we call it spinHistory because "history" is already a built-in name in the browser.
+   ===================================================== */
+const HISTORY_KEY = "spinHistory";
+
+function loadHistory() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(HISTORY_KEY));
+    return Array.isArray(saved) ? saved : [];
+  } catch (error) {
+    return [];
+  }
+}
+let spinHistory = loadHistory();
+
+function saveHistory() {
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(spinHistory));
+  } catch (error) {
+    // storage can be blocked (private mode). The spin must still work, so we ignore it
+  }
+}
+
+function saveSpin(name, prize) {
+  spinHistory.push({ name: name, prize: prize.name, time: Date.now() });
+  saveHistory();
+  renderHistory();
+}
+
+function renderHistory() {
+  historyList.innerHTML = ""; // safe: we are only clearing, not inserting anything typed by a user
+  historyStats.innerHTML = "";
+
+  const hasSpins = spinHistory.length > 0;
+  historyEmpty.style.display = hasSpins ? "none" : "block";
+  clearHistoryBtn.style.display = hasSpins ? "inline-block" : "none";
+  historyCount.textContent = hasSpins ? spinHistory.length : ""; // the little number on the nav
+  if (!hasSpins) return;
+
+  // stat cards: total, then how many times each prize has been won
+  addStat(spinHistory.length, "Total spins", true);
+  prizes.forEach(function (prize) {
+    const count = spinHistory.filter(function (item) {
+      return item.prize === prize.name;
+    }).length;
+    addStat(count, prize.name, false);
+  });
+
+  // newest first, so we count backwards
+  for (let i = spinHistory.length - 1; i >= 0; i--) {
+    historyList.appendChild(makeRow(spinHistory[i]));
+  }
+}
+
+function addStat(number, label, isTotal) {
+  const card = document.createElement("div");
+  card.className = isTotal ? "stat total" : "stat";
+  const big = document.createElement("strong");
+  big.textContent = number;
+  const small = document.createElement("span");
+  small.textContent = label;
+  card.append(big, small);
+  historyStats.appendChild(card);
+}
+
+// SECURITY: a name is typed by a user, so we use textContent (plain text) and never innerHTML.
+// If someone types <img onerror=...> as their name, textContent just shows those letters.
+function makeRow(item) {
+  const prize = prizes.find(function (p) {
+    return p.name === item.prize;
+  });
+
+  const row = document.createElement("div");
+  row.className = "history-row";
+
+  const avatar = document.createElement("div");
+  avatar.className = "avatar";
+  avatar.textContent = item.name.charAt(0).toUpperCase();
+
+  const info = document.createElement("div");
+  info.className = "history-info";
+  const name = document.createElement("div");
+  name.className = "history-name";
+  name.textContent = item.name;
+  const won = document.createElement("div");
+  won.className = "history-prize";
+  const prizeName = document.createElement("b");
+  prizeName.textContent = item.prize;
+  won.append("won ", prizeName);
+  info.append(name, won);
+
+  const time = document.createElement("div");
+  time.className = "history-time";
+  time.textContent = new Date(item.time).toLocaleString([], {
+    day: "numeric",
+    month: "short",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+  row.append(avatar, info);
+  if (prize) {
+    const thumb = document.createElement("img");
+    thumb.className = "history-thumb";
+    thumb.src = prize.image;
+    thumb.alt = prize.name;
+    row.append(thumb);
+  }
+  row.append(time);
+  return row;
+}
+
+function clearHistory() {
+  if (confirm("Delete the whole spin history?")) {
+    spinHistory = [];
+    saveHistory();
+    renderHistory();
+  }
+}
+
+renderHistory();
+
+/* =====================================================
+   10. WEIGHTED RANDOM (cheap prizes win more often)
+   The "range method": give every prize a stretch on a number line.
+   A bigger stretch = a bigger chance. Throw a dart, see whose stretch it hits.
+   ===================================================== */
+
+// how strongly price matters:
+//   0   = every prize has the same chance
+//   0.5 = gentle (default)
+//   1   = very strong: a prize that costs 10x more wins 10x less often
+const PRICE_POWER = 0.5;
+
+// step 1: one weight per prize. Higher price = smaller weight.
+function getWeights() {
+  return prizes.map(function (prize) {
+    return 1 / Math.pow(Math.max(prize.price, 1), PRICE_POWER); // Math.max stops a price of 0 from breaking the maths
+  });
+}
+
+// step 2 + 3 + 4: build the ranges, throw the dart, find the winner
+function pickPrize() {
+  const weights = getWeights();
+  const total = weights.reduce(function (sum, w) {
+    return sum + w;
+  }, 0);
+
+  let point = Math.random() * total; // a random spot on the line from 0 to total
+
+  for (let i = 0; i < prizes.length; i++) {
+    if (point < weights[i]) return prizes[i]; // the dart landed inside this prize's range
+    point -= weights[i]; // no? move past this range and check the next one
+  }
+  return prizes[prizes.length - 1]; // safety net, it should never be reached
+}
+
+// each prize sits on 2 slices of the wheel. Pick one of them at random.
+function pickSlice(prize) {
+  const options = [];
+  for (let i = 0; i < segments.length; i++) {
+    if (segments[i] === prize) options.push(i);
+  }
+  return options[Math.floor(Math.random() * options.length)];
+}
+
+/* =====================================================
+   11. TESTING TOOLS (type these in the browser console, F12)
+   showOdds()        -> the chance of every prize, in %
+   simulate(10000)   -> spins 10000 times (no wheel, no history) and counts the wins
+   ===================================================== */
+function showOdds() {
+  const weights = getWeights();
+  const total = weights.reduce(function (sum, w) {
+    return sum + w;
+  }, 0);
+  console.table(
+    prizes.map(function (prize, i) {
+      return {
+        prize: prize.name,
+        price: prize.price,
+        chance: ((weights[i] / total) * 100).toFixed(1) + "%",
+      };
+    }),
+  );
+}
+
+function simulate(times) {
+  const wins = {};
+  prizes.forEach(function (prize) {
+    wins[prize.name] = 0;
+  });
+  for (let i = 0; i < times; i++) {
+    wins[pickPrize().name]++;
+  }
+  console.table(
+    prizes.map(function (prize) {
+      return {
+        prize: prize.name,
+        wins: wins[prize.name],
+        percent: ((wins[prize.name] / times) * 100).toFixed(1) + "%",
+      };
+    }),
+  );
 }
