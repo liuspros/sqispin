@@ -13,13 +13,14 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- ================= FLOATING NAV PILL ================= -->
+    <!-- ================= FLOATING NAV PILL (bottom) ================= -->
     <nav id="navPill">
       <span id="navIndicator"></span>
       <button class="nav-btn active" onclick="showPage(0)">Spin</button>
       <button class="nav-btn" onclick="showPage(1)">
         History <span id="historyCount" class="badge"></span>
       </button>
+      <button class="nav-btn" onclick="showPage(2)">Settings</button>
     </nav>
 
     <!-- ================= PAGES (slide left / right) ================= -->
@@ -75,7 +76,7 @@
           <!-- WHEEL -->
           <main>
             <h1>Free Gift <span>Spin Wheel</span></h1>
-            <p class="sub">Type your name, then tap <strong>SPIN</strong> and let luck pick your gift.</p>
+            <p class="sub">Enter your name and tap <strong>SPIN</strong> to win!</p>
 
             <div id="nameBox">
               <input
@@ -97,45 +98,120 @@
               <button id="spinBtn" onclick="spin()">SPIN</button>
             </div>
 
-            <button id="soundBtn" onclick="toggleSound()">Sound: On</button>
+            <!-- how many of each gift is left (filled by JS) -->
+            <div id="giftsLeft"></div>
           </main>
-
-          <footer>SQI Tech Fest Week &bull; Good luck!</footer>
         </section>
 
         <!-- ---------- PAGE 2: HISTORY ---------- -->
         <section class="page inactive" id="pageHistory">
           <div id="historyBox">
             <h1>Spin <span>History</span></h1>
-            <p class="sub">Everyone who has spun, and what they won.</p>
+            <p class="sub">Everyone who has won, and what they got.</p>
 
             <div id="historyStats"></div>
 
             <div id="historyList"></div>
-            <p id="historyEmpty">No spins yet. Be the first to win!</p>
+            <p id="historyEmpty">No winners yet. Be the first!</p>
+          </div>
+        </section>
 
-            <button id="clearHistoryBtn" onclick="clearHistory()">Clear History</button>
+        <!-- ---------- PAGE 3: ORGANIZER SETTINGS ---------- -->
+        <section class="page inactive" id="pageSettings">
+          <div id="settingsBox">
+            <h1>Organizer <span>Settings</span></h1>
+            <p class="sub">Only the organizer can open this part.</p>
+
+            <!-- LOCK SCREEN -->
+            <div id="gate" class="card">
+              <p id="gateText"></p>
+              <input type="password" id="gatePass" class="field" placeholder="Password" autocomplete="off" />
+              <input type="password" id="gatePass2" class="field" placeholder="Confirm password" autocomplete="off" />
+              <p id="gateMessage" class="msg"></p>
+              <button id="gateBtn" class="btn" onclick="submitGate()">Unlock</button>
+            </div>
+
+            <!-- SETTINGS PANEL (only visible after the password) -->
+            <div id="panel">
+              <div class="panel-top">
+                <span class="unlocked">&#9679; Unlocked</span>
+                <button class="btn btn-ghost" onclick="lockSettings()">Lock</button>
+              </div>
+
+              <h2>Gifts</h2>
+              <div id="giftList"></div>
+              <button class="btn" onclick="openGiftForm(null)">+ Add gift</button>
+
+              <!-- add / edit form -->
+              <div id="giftForm" class="card">
+                <h3 id="formTitle">Add gift</h3>
+
+                <label for="gName">Name</label>
+                <input type="text" id="gName" class="field" maxlength="20" placeholder="e.g. Hoodie" />
+
+                <div class="two">
+                  <div>
+                    <label for="gPrice">Price (&#8358;)</label>
+                    <input type="number" id="gPrice" class="field" min="1" placeholder="5000" />
+                  </div>
+                  <div>
+                    <label for="gStock">How many</label>
+                    <input type="number" id="gStock" class="field" min="0" placeholder="10" />
+                  </div>
+                </div>
+
+                <label for="gFile">Picture (best: PNG with transparent background)</label>
+                <input type="file" id="gFile" accept="image/*" onchange="onFileChosen()" />
+
+                <label for="gLink">or paste an image link</label>
+                <input type="text" id="gLink" class="field" placeholder="https://..." oninput="onLinkTyped()" />
+
+                <img id="gPreview" alt="Preview" />
+                <p id="formMessage" class="msg"></p>
+
+                <div class="row-btns">
+                  <button class="btn" onclick="saveGift()">Save</button>
+                  <button class="btn btn-ghost" onclick="closeGiftForm()">Cancel</button>
+                </div>
+              </div>
+
+              <h2>Try Again chance</h2>
+              <p class="hint">How often the wheel lands on "Try Again" (0 to 90%).</p>
+              <input type="number" id="tryChanceInput" class="field short" min="0" max="90" oninput="updateTryChance()" />
+
+              <h2>Change password</h2>
+              <input type="password" id="newPass" class="field" placeholder="New password" autocomplete="off" />
+              <input type="password" id="newPass2" class="field" placeholder="Confirm new password" autocomplete="off" />
+              <p id="passMessage" class="msg"></p>
+              <button class="btn" onclick="changePassword()">Change password</button>
+
+              <h2>Danger zone</h2>
+              <div class="row-btns">
+                <button class="btn btn-danger" onclick="clearHistory()">Clear history</button>
+                <button class="btn btn-danger" onclick="resetGifts()">Reset gifts</button>
+              </div>
+            </div>
           </div>
         </section>
       </div>
     </div>
 
-    <!-- ================= WIN POPUP ================= -->
+    <!-- ================= RESULT POPUP (win or try again) ================= -->
     <div id="popup">
       <canvas id="confetti"></canvas>
       <div id="popupCard">
-        <p class="congrats">Congratulations!</p>
+        <p class="congrats" id="congratsText">Congratulations!</p>
         <h2 id="winText">You won a Gift</h2>
 
         <div class="bubble">
-          <img id="winImage" src="" alt="Your prize" />
+          <img id="winImage" src="" alt="Your result" />
           <span class="mini mini-1"></span>
           <span class="mini mini-2"></span>
           <span class="mini mini-3"></span>
         </div>
 
-        <p class="note">Show this screen at the SQI Tech Fest desk to claim your gift.</p>
-        <button onclick="closePopup()">Awesome!</button>
+        <p class="note" id="popupNote">Show this screen at the SQI Tech Fest desk to claim your gift.</p>
+        <button id="popupBtn" onclick="closePopup()">Awesome!</button>
       </div>
     </div>
 

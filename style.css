@@ -31,7 +31,7 @@ button {
   position: relative;
   overflow: hidden; /* hides the slides that are off-screen */
   width: 100%;
-  height: clamp(230px, 28vw, 290px);
+  height: clamp(150px, 17vw, 200px); /* short banner, so the wheel sits higher */
   touch-action: pan-y; /* page can still scroll up/down, we handle left/right */
   user-select: none;
   box-shadow: 0 6px 24px rgba(11, 31, 92, 0.18);
@@ -48,7 +48,7 @@ button {
   position: relative;
   display: flex;
   align-items: center;
-  padding: 56px 9% 0; /* top space so the floating nav never covers the flyer text */
+  padding: 40px 9% 0; /* top space for the small logo */
   overflow: hidden;
 }
 
@@ -107,7 +107,7 @@ button {
 }
 
 .slide h2 {
-  font-size: clamp(22px, 4.6vw, 46px);
+  font-size: clamp(19px, 3.4vw, 34px);
   font-weight: 800;
   line-height: 1.1;
   margin: 10px 0 8px;
@@ -229,7 +229,7 @@ button {
 /* ---------- HEADINGS ---------- */
 main {
   text-align: center;
-  padding: 26px 16px 10px;
+  padding: 14px 16px 0;
 }
 
 h1 {
@@ -243,7 +243,7 @@ h1 span {
 }
 
 .sub {
-  margin: 0 0 26px;
+  margin: 0 0 12px;
   color: #51618f;
   font-size: 15px;
 }
@@ -251,7 +251,7 @@ h1 span {
 /* ---------- WHEEL ---------- */
 #wheelBox {
   position: relative;
-  width: min(92vw, 480px);
+  width: min(88vw, 470px);
   aspect-ratio: 1; /* keeps it a perfect square */
   margin: 0 auto;
 }
@@ -324,25 +324,6 @@ h1 span {
 @keyframes pulse {
   0%, 100% { box-shadow: 0 6px 18px rgba(255, 122, 26, 0.6), 0 0 0 0 rgba(255, 122, 26, 0.5); }
   50% { box-shadow: 0 6px 18px rgba(255, 122, 26, 0.6), 0 0 0 14px rgba(255, 122, 26, 0); }
-}
-
-#soundBtn {
-  height: 36px;
-  padding: 0 18px;
-  margin-top: 26px;
-  border-radius: 30px;
-  border: 1px solid #c5d3f5;
-  background: white;
-  color: var(--navy);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-footer {
-  text-align: center;
-  padding: 18px 16px 28px;
-  font-size: 13px;
-  color: #51618f;
 }
 
 /* ---------- WIN POPUP ---------- */
@@ -504,7 +485,7 @@ footer {
   --count: 2; /* how many pages */
   --index: 0; /* which page is open */
   position: fixed; /* stays on screen while you scroll */
-  top: 14px;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px)); /* bottom of the screen (safe area = iPhone home bar) */
   left: 50%;
   transform: translateX(-50%);
   z-index: 50; /* sits above the banner and pages (popup is 100, so it stays above the nav) */
@@ -592,6 +573,7 @@ footer {
   flex: 0 0 100%;
   min-width: 0;
   min-height: 100vh;
+  padding-bottom: 90px; /* room for the floating nav at the bottom */
 }
 
 /* the page that is off-screen is cut short, so the open page decides how tall the site is */
@@ -603,10 +585,10 @@ footer {
 /* ---------- SQI LOGO ON THE FLYERS ---------- */
 .slide-logo {
   position: absolute;
-  top: 10px;
+  top: 8px;
   left: 9%;
   z-index: 3;
-  height: 42px;
+  height: 36px;
   width: auto;
   padding: 3px 6px;
   border-radius: 12px;
@@ -619,7 +601,7 @@ footer {
 /* ---------- NAME INPUT ---------- */
 #nameBox {
   max-width: 320px;
-  margin: 0 auto 30px;
+  margin: 0 auto 22px;
 }
 
 #playerName {
@@ -662,8 +644,8 @@ footer {
 }
 
 #nameMessage {
-  min-height: 20px; /* keeps the layout from jumping when the message appears */
-  margin: 6px 0 0;
+  min-height: 18px; /* keeps the layout from jumping when the message appears */
+  margin: 4px 0 0;
   font-size: 13px;
   color: #e02424;
 }
@@ -672,7 +654,7 @@ footer {
 #historyBox {
   max-width: 560px;
   margin: 0 auto;
-  padding: 96px 16px 40px; /* top space so the floating nav does not cover the title */
+  padding: 28px 16px 20px;
   text-align: center;
 }
 
@@ -789,27 +771,319 @@ footer {
   color: #51618f;
 }
 
-#clearHistoryBtn {
-  height: 38px;
-  margin-top: 26px;
-  padding: 0 20px;
-  border: 1px solid #f3b3b3;
+/* ---------- GIFTS LEFT (small strip under the wheel) ---------- */
+#giftsLeft {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  max-width: 440px;
+  margin: 10px auto 0;
+}
+
+.left-title {
+  width: 100%;
+  color: #51618f;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.left-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px 2px 3px;
   border-radius: 30px;
   background: white;
-  color: #e02424;
+  box-shadow: 0 2px 8px rgba(11, 31, 92, 0.1);
+  color: var(--navy);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.left-chip img {
+  width: 22px;
+  height: 22px;
+  padding: 2px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffffff, #dfe9ff);
+  object-fit: contain;
+}
+
+.left-chip.low {
+  color: var(--orange); /* 2 or less left */
+}
+
+.left-chip.out {
+  opacity: 0.45;
+}
+
+.left-chip.out img {
+  filter: grayscale(1);
+}
+
+/* ---------- SETTINGS PAGE ---------- */
+#settingsBox {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 28px 16px 20px;
+  text-align: center;
+}
+
+#settingsBox h2 {
+  margin: 28px 0 10px;
+  font-size: 17px;
+  text-align: left;
+}
+
+#settingsBox h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.card {
+  padding: 18px;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 6px 20px rgba(11, 31, 92, 0.1);
+  text-align: left;
+}
+
+#gate {
+  max-width: 340px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+#gate p {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #51618f;
+}
+
+.field {
+  width: 100%;
+  height: 42px;
+  margin-bottom: 10px;
+  padding: 0 14px;
+  border: 2px solid #d3def7;
+  border-radius: 14px;
+  background: white;
+  color: var(--navy);
+  font-family: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+.field:focus {
+  border-color: var(--blue);
+}
+
+.field.short {
+  width: 120px;
+  display: block;
+}
+
+.field.shake {
+  animation: shake 0.45s;
+  border-color: #e02424;
+}
+
+label {
+  display: block;
+  margin: 8px 0 4px;
+  color: #51618f;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.hint {
+  margin: -4px 0 8px;
+  color: #51618f;
+  font-size: 13px;
+  text-align: left;
+}
+
+.msg {
+  min-height: 18px;
+  margin: 0 0 8px;
   font-size: 13px;
   font-weight: 600;
+  color: #e02424;
+}
+
+.btn {
+  height: 40px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 30px;
+  background: var(--blue);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(26, 86, 255, 0.3);
+}
+
+.btn-ghost {
+  border: 1px solid #c5d3f5;
+  background: white;
+  color: var(--navy);
+  box-shadow: none;
+}
+
+.btn-danger {
+  border: 1px solid #f3b3b3;
+  background: white;
+  color: #e02424;
+  box-shadow: none;
+}
+
+.btn-small {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 12px;
+  box-shadow: none;
+}
+
+.row-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.panel-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.unlocked {
+  color: #12a150;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+#panel,
+#giftForm {
+  display: none;
+}
+
+#giftList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+#giftForm {
+  margin-top: 14px;
+}
+
+#gPreview {
+  display: none;
+  width: 80px;
+  height: 80px;
+  margin: 10px 0 4px;
+  padding: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffffff, #dfe9ff);
+  object-fit: contain;
+}
+
+.gift-row {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  grid-template-areas: "thumb info stepper" "thumb buttons buttons";
+  align-items: center;
+  gap: 4px 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 4px 14px rgba(11, 31, 92, 0.08);
+}
+
+.gift-thumb {
+  grid-area: thumb;
+  width: 44px;
+  height: 44px;
+  padding: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffffff, #dfe9ff);
+  object-fit: contain;
+}
+
+.gift-info {
+  grid-area: info;
+  min-width: 0;
+}
+
+.gift-name {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gift-meta {
+  color: #51618f;
+  font-size: 12px;
+}
+
+.stepper {
+  grid-area: stepper;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stepper button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid #c5d3f5;
+  border-radius: 50%;
+  background: white;
+  color: var(--navy);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stepper span {
+  min-width: 26px;
+  font-size: 15px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.gift-buttons {
+  grid-area: buttons;
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
 }
 
 /* ---------- SMALL SCREENS ---------- */
 @media (max-width: 600px) {
-  .slide-logo { height: 32px; left: 6%; top: 8px; padding: 2px 4px; border-radius: 9px; }
-  .nav-btn { min-width: 100px; }
-  .slide { padding: 54px 6% 0; }
-  .slide-text { max-width: 60%; }
-  .slide h2 { font-size: 21px; }
+  .slide-logo { height: 30px; left: 6%; top: 6px; padding: 2px 4px; border-radius: 9px; }
+  .nav-btn { min-width: 92px; padding: 0 10px; }
+  .slide { padding: 36px 6% 0; }
+  .slide p { display: none; } /* the small line is hidden on phones to keep the banner short */
+  .slide-text { max-width: 66%; }
+  .slide h2 { font-size: 18px; }
   .slide p { font-size: 11px; }
-  .img-one { height: 56%; right: 3%; top: 18%; }
+  .img-one { height: 66%; right: 1%; top: 18%; }
   .img-two { display: none; }
   .arrow { display: none; } /* phones use swipe */
   .bubble { width: 200px; height: 200px; }
