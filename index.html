@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SQI Tech Fest | Spin & Win</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- ================= BANNER (auto-swipe) ================= -->
+    <section id="banner">
+      <div id="bannerTrack">
+        <!-- Flyer 1 -->
+        <div class="slide slide-blue">
+          <div class="slide-text">
+            <span class="tag">Free for every student</span>
+            <h2>Get a chance to win <em>amazing gifts</em></h2>
+            <p>Spin the wheel and walk away with something cool.</p>
+          </div>
+          <img class="slide-img img-one" src="images/watch.png" alt="Smart watch" />
+          <img class="slide-img img-two" src="images/powerbank.png" alt="Power bank" />
+        </div>
+
+        <!-- Flyer 2 -->
+        <div class="slide slide-white">
+          <div class="slide-text">
+            <span class="tag tag-orange">SQI College of ICT</span>
+            <h2>SQI <em>Tech Fest</em> Week</h2>
+            <p>Code. Create. Celebrate. Come and be part of it.</p>
+          </div>
+          <img class="slide-img img-one" src="images/cap.png" alt="Cap" />
+          <img class="slide-img img-two" src="images/tshirt.png" alt="T-shirt" />
+        </div>
+
+        <!-- Flyer 3 -->
+        <div class="slide slide-orange">
+          <div class="slide-text">
+            <span class="tag tag-white">Today only</span>
+            <h2>Spin. Win. <em>Smile.</em></h2>
+            <p>Power banks, smart watches, caps, tees and more.</p>
+          </div>
+          <img class="slide-img img-one" src="images/pen.png" alt="Pen" />
+          <img class="slide-img img-two" src="images/watch.png" alt="Smart watch" />
+        </div>
+      </div>
+
+      <button class="arrow arrow-left" onclick="prevSlide()" aria-label="Previous">&#8249;</button>
+      <button class="arrow arrow-right" onclick="nextSlide()" aria-label="Next">&#8250;</button>
+      <div id="bannerDots"></div>
+    </section>
+
+    <!-- ================= WHEEL ================= -->
+    <main>
+      <h1>Free Gift <span>Spin Wheel</span></h1>
+      <p class="sub">Tap <strong>SPIN</strong> and let luck pick your gift.</p>
+
+      <div id="wheelBox">
+        <div id="pointer"></div>
+        <div id="wheelFrame">
+          <canvas id="wheel"></canvas>
+        </div>
+        <button id="spinBtn" onclick="spin()">SPIN</button>
+      </div>
+
+      <button id="soundBtn" onclick="toggleSound()">Sound: On</button>
+    </main>
+
+    <footer>SQI Tech Fest Week &bull; Good luck!</footer>
+
+    <!-- ================= WIN POPUP ================= -->
+    <div id="popup">
+      <canvas id="confetti"></canvas>
+      <div id="popupCard">
+        <p class="congrats">Congratulations!</p>
+        <h2 id="winText">You won a Gift</h2>
+
+        <div class="bubble">
+          <img id="winImage" src="" alt="Your prize" />
+          <span class="mini mini-1"></span>
+          <span class="mini mini-2"></span>
+          <span class="mini mini-3"></span>
+        </div>
+
+        <p class="note">Show this screen at the SQI Tech Fest desk to claim your gift.</p>
+        <button onclick="closePopup()">Awesome!</button>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

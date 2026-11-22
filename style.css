@@ -1,0 +1,511 @@
+/* ---------- COLORS (change them here, they update everywhere) ---------- */
+:root {
+  --blue: #1a56ff;
+  --navy: #0b1f5c;
+  --orange: #ff7a1a;
+  --white: #ffffff;
+  --soft: #f2f6ff;
+}
+
+/* ---------- BASE ---------- */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", Arial, Helvetica, sans-serif;
+  background: radial-gradient(circle at 50% 0%, #ffffff 0%, var(--soft) 55%, #dfe9ff 100%);
+  color: var(--navy);
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* ---------- BANNER ---------- */
+#banner {
+  position: relative;
+  overflow: hidden; /* hides the slides that are off-screen */
+  width: 100%;
+  height: clamp(190px, 28vw, 280px);
+  touch-action: pan-y; /* page can still scroll up/down, we handle left/right */
+  user-select: none;
+  box-shadow: 0 6px 24px rgba(11, 31, 92, 0.18);
+}
+
+#bannerTrack {
+  display: flex; /* puts the slides side by side */
+  height: 100%;
+  transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.slide {
+  flex: 0 0 100%; /* every slide is exactly as wide as the banner */
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 9%;
+  overflow: hidden;
+}
+
+.slide-blue {
+  background: linear-gradient(120deg, #0b1f5c 0%, #1a56ff 70%, #4f86ff 100%);
+  color: white;
+}
+
+.slide-white {
+  background: linear-gradient(120deg, #ffffff 0%, #eaf1ff 100%);
+  color: var(--navy);
+}
+
+.slide-orange {
+  background: linear-gradient(120deg, #ff7a1a 0%, #ff9d4d 100%);
+  color: white;
+}
+
+/* soft decorative circles behind every flyer */
+.slide::before,
+.slide::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.slide::before {
+  width: 320px;
+  height: 320px;
+  right: -60px;
+  top: -120px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.slide::after {
+  width: 180px;
+  height: 180px;
+  right: 22%;
+  bottom: -90px;
+  background: rgba(255, 122, 26, 0.25);
+}
+
+.slide-white::before {
+  background: rgba(26, 86, 255, 0.1);
+}
+
+.slide-orange::after {
+  background: rgba(26, 86, 255, 0.3);
+}
+
+.slide-text {
+  position: relative;
+  z-index: 2;
+  max-width: 55%;
+}
+
+.slide h2 {
+  font-size: clamp(22px, 4.6vw, 46px);
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 10px 0 8px;
+}
+
+.slide h2 em {
+  font-style: normal;
+  color: var(--orange);
+}
+
+.slide-orange h2 em {
+  color: var(--navy);
+}
+
+.slide p {
+  margin: 0;
+  font-size: clamp(12px, 1.7vw, 17px);
+  font-weight: 500;
+  opacity: 0.92;
+}
+
+.tag {
+  display: inline-block;
+  background: var(--orange);
+  color: white;
+  font-size: clamp(10px, 1.3vw, 13px);
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 30px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.tag-orange {
+  background: var(--blue);
+}
+
+.tag-white {
+  background: white;
+  color: var(--orange);
+}
+
+/* the product pictures that float on the right side of each flyer */
+.slide-img {
+  position: absolute;
+  z-index: 1;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.3));
+  animation: floaty 4s ease-in-out infinite;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.img-one {
+  height: 78%;
+  right: 17%;
+  top: 11%;
+}
+
+.img-two {
+  height: 60%;
+  right: 5%;
+  bottom: 8%;
+  animation-delay: -2s;
+}
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-10px) rotate(4deg); }
+}
+
+/* banner arrows + dots */
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--navy);
+  font-size: 26px;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.arrow-left { left: 12px; }
+.arrow-right { right: 12px; }
+
+#bannerDots {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  z-index: 5;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 1px rgba(11, 31, 92, 0.25);
+  cursor: pointer;
+  transition: width 0.3s, background 0.3s;
+}
+
+.dot.active {
+  width: 26px;
+  background: var(--orange);
+}
+
+/* ---------- HEADINGS ---------- */
+main {
+  text-align: center;
+  padding: 26px 16px 10px;
+}
+
+h1 {
+  font-size: clamp(26px, 5vw, 40px);
+  font-weight: 800;
+  margin: 0 0 4px;
+}
+
+h1 span {
+  color: var(--blue);
+}
+
+.sub {
+  margin: 0 0 26px;
+  color: #51618f;
+  font-size: 15px;
+}
+
+/* ---------- WHEEL ---------- */
+#wheelBox {
+  position: relative;
+  width: min(92vw, 480px);
+  aspect-ratio: 1; /* keeps it a perfect square */
+  margin: 0 auto;
+}
+
+/* the frame stays still and clips the spinning canvas into a circle.
+   Without it, the square canvas corners stick out while spinning and
+   make the page wider than the phone screen. */
+#wheelFrame {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 24px 50px rgba(11, 31, 92, 0.35), 0 0 0 6px rgba(255, 255, 255, 0.7);
+}
+
+#wheel {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#pointer {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  width: 44px;
+  height: 58px;
+  margin-left: -22px;
+  z-index: 6;
+  background: linear-gradient(180deg, #ff9d4d, var(--orange));
+  clip-path: polygon(50% 100%, 0% 36%, 10% 14%, 28% 3%, 50% 0%, 72% 3%, 90% 14%, 100% 36%);
+  transform-origin: 50% 20%;
+  transition: transform 0.08s ease-out;
+}
+
+#pointer.tick {
+  transform: rotate(-16deg);
+}
+
+#spinBtn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 21%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  height: auto;
+  border: 5px solid white;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffb26b, var(--orange) 70%);
+  color: white;
+  font-size: clamp(14px, 3.4vw, 20px);
+  font-weight: 800;
+  letter-spacing: 1px;
+  box-shadow: 0 6px 18px rgba(255, 122, 26, 0.6);
+  animation: pulse 1.8s ease-in-out infinite;
+}
+
+#spinBtn:hover {
+  filter: brightness(1.08);
+}
+
+#spinBtn:disabled {
+  animation: none;
+  filter: grayscale(0.4) brightness(0.9);
+  cursor: not-allowed;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 6px 18px rgba(255, 122, 26, 0.6), 0 0 0 0 rgba(255, 122, 26, 0.5); }
+  50% { box-shadow: 0 6px 18px rgba(255, 122, 26, 0.6), 0 0 0 14px rgba(255, 122, 26, 0); }
+}
+
+#soundBtn {
+  height: 36px;
+  padding: 0 18px;
+  margin-top: 26px;
+  border-radius: 30px;
+  border: 1px solid #c5d3f5;
+  background: white;
+  color: var(--navy);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+footer {
+  text-align: center;
+  padding: 18px 16px 28px;
+  font-size: 13px;
+  color: #51618f;
+}
+
+/* ---------- WIN POPUP ---------- */
+#popup {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(8, 20, 66, 0.78);
+  backdrop-filter: blur(4px);
+}
+
+#popup.show {
+  display: flex;
+}
+
+#confetti {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#popupCard {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 400px;
+  background: white;
+  border-radius: 28px;
+  padding: 26px 22px 24px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  border-top: 8px solid var(--orange);
+  animation: pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes pop {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.congrats {
+  margin: 0;
+  color: var(--orange);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+#winText {
+  margin: 6px 0 14px;
+  font-size: clamp(24px, 6vw, 30px);
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.note {
+  margin: 8px 0 18px;
+  font-size: 13px;
+  color: #51618f;
+}
+
+#popupCard button {
+  height: 46px;
+  padding: 0 34px;
+  border: none;
+  border-radius: 30px;
+  background: var(--blue);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 6px 16px rgba(26, 86, 255, 0.4);
+}
+
+/* ---------- THE BUBBLE (glass / foam look made with pure CSS) ---------- */
+.bubble {
+  position: relative;
+  width: 230px;
+  height: 230px;
+  margin: 0 auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 45%, rgba(90, 160, 255, 0.28) 100%),
+    radial-gradient(circle at 70% 80%, rgba(255, 150, 60, 0.3), transparent 45%);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    inset 0 0 26px rgba(255, 255, 255, 0.85),
+    inset 12px 12px 30px rgba(26, 86, 255, 0.28),
+    inset -12px -14px 30px rgba(255, 122, 26, 0.3),
+    0 18px 34px rgba(26, 86, 255, 0.28);
+  animation: bubbleFloat 3.2s ease-in-out infinite;
+}
+
+/* big shine at top-left */
+.bubble::before {
+  content: "";
+  position: absolute;
+  top: 9%;
+  left: 14%;
+  width: 34%;
+  height: 20%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));
+  transform: rotate(-35deg);
+}
+
+/* small shine at bottom-right */
+.bubble::after {
+  content: "";
+  position: absolute;
+  bottom: 11%;
+  right: 16%;
+  width: 14%;
+  height: 8%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  transform: rotate(-35deg);
+}
+
+#winImage {
+  width: 72%;
+  height: 72%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 10px rgba(11, 31, 92, 0.35));
+  position: relative;
+  z-index: 1;
+}
+
+/* little foam bubbles floating around the big one */
+.mini {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffffff, rgba(160, 200, 255, 0.35) 60%, rgba(26, 86, 255, 0.25));
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  animation: bubbleFloat 2.6s ease-in-out infinite;
+}
+
+.mini-1 { width: 30px; height: 30px; top: -6px; right: -12px; }
+.mini-2 { width: 18px; height: 18px; bottom: 10px; left: -14px; animation-delay: -1s; }
+.mini-3 { width: 12px; height: 12px; top: 40%; right: -22px; animation-delay: -1.8s; }
+
+@keyframes bubbleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+
+/* ---------- SMALL SCREENS ---------- */
+@media (max-width: 600px) {
+  .slide { padding: 0 6%; }
+  .slide-text { max-width: 60%; }
+  .slide h2 { font-size: 21px; }
+  .slide p { font-size: 11px; }
+  .img-one { height: 56%; right: 3%; top: 18%; }
+  .img-two { display: none; }
+  .arrow { display: none; } /* phones use swipe */
+  .bubble { width: 200px; height: 200px; }
+}
